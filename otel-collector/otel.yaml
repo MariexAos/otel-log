@@ -1,0 +1,39 @@
+receivers:
+  filelog:
+    include: ["/Users/mariexaos/logs/dsp-tcp-gateway/dsp-tcp-gateway.log"]
+    start_at: "end"
+    operators:
+      - type: regex_parser
+        regex: '^(?P<timestamp>\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.\d{3})\s+\[[^\]]+\]\s+(?P<log_level>\S+).*$'
+        timestamp:
+          layout: '%Y-%m-%d %H:%M:%S'
+          parse_from: attributes.timestamp
+processors:
+  # resource:
+  #   attributes:
+  #     - key: service.name
+  #       value: "${SERVICE_NAME:default-service}"      # 从环境变量获取 k8s service.name
+  #       action: upsert
+  #     - key: instance.id
+  #       value: "${INSTANCE_ID:default-INSTANCE_ID}"       # 从环境变量获取 k8s instance id (Pod 名称)
+  #       action: upsert
+  batch:
+  #   send_batch_size: 1
+    timeout: 10s
+  # transform/logid:
+  #   log_statements:
+  #     - set(attributes.log_id, GenerateUUID())
+
+exporters:
+  kafka:
+    brokers: ["127.0.0.1:9092"]
+    topic: "otel-logs"
+    encoding: "otlp_json"
+
+service:
+  pipelines:
+    logs:
+      receivers: [filelog]
+      # processors: [resource, batch, transform/logid]
+      processors: [batch]
+      exporters: [kafka]

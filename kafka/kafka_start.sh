@@ -1,0 +1,1 @@
+docker run -d -p 9092:9092 -n kafka apache/kafka-native:3.9.0

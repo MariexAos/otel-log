@@ -1,0 +1,2 @@
+otel-collector/otelcol filter=lfs diff=lfs merge=lfs -text
+otel-collector/otelcontribcol_darwin_arm64 filter=lfs diff=lfs merge=lfs -text

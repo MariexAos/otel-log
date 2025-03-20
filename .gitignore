@@ -1,0 +1,14 @@
+nacos
+build
+kafka_2.13-3.9.0
+kafka-tmp
+kafka-logs
+kafka-config
+doris_be_log
+doris_be_storage
+doris_fe_log
+doris_fe_meta
+.DS_Store
+
+otel-collector/otelcol
+otel-collector/otelcontribcol_darwin_arm64

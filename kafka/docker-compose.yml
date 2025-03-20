@@ -1,0 +1,10 @@
+services:
+  kafka:
+    image: apache/kafka-native:3.9.0
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    volumes:
+      - ./kafka-tmp:/tmp
+      - ./kafka-config:/opt/kafka/config
+      - ./kafka-logs:/opt/kafka/logs

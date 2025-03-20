@@ -1,0 +1,23 @@
+services:
+  fe:
+    image: apache/doris:fe-3.0.4
+    hostname: fe
+    environment:
+     - FE_SERVERS=fe1:127.0.0.1:9010
+     - FE_ID=1
+    network_mode: host
+    volumes:
+      - ./doris_fe_meta:/opt/apache-doris/fe/doris-meta
+      - ./doris_fe_log:/opt/apache-doris/fe/log
+  be:
+    image: apache/doris:be-3.0.4
+    hostname: be
+    environment:
+     - FE_SERVERS=fe1:127.0.0.1:9010
+     - BE_ADDR=127.0.0.1:9050
+    depends_on:
+      - fe
+    network_mode: host
+    volumes:
+      - ./doris_be_storage:/opt/apache-doris/be/storage
+      - ./doris_be_log:/opt/apache-doris/be/log
