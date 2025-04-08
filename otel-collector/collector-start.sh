@@ -1,1 +1,1 @@
-./otel-collector/otelcontribcol_darwin_arm64 --config=otel.yaml
+./otelcontribcol_darwin_arm64 --config=otel.yaml

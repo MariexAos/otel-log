@@ -1,0 +1,74 @@
+[
+    {
+        "resourceLogs": [
+            {
+                "resource": {},
+                "scopeLogs": [
+                    {
+                        "scope": {},
+                        "logRecords": [
+                            {
+                                "timeUnixNano": "1743554551017000000",
+                                "observedTimeUnixNano": "1743554551091365000",
+                                "body": {
+                                    "stringValue": "2025-04-02 08:42:31.017 [parallel-3] DEBUG [32465] [] c.h.d.d.s.i.HeartbeatServiceImpl - 开始执行心跳检查..."
+                                },
+                                "attributes": [
+                                    {
+                                        "key": "log.file.name",
+                                        "value": {
+                                            "stringValue": "dsp-tcp-gateway.log"
+                                        }
+                                    },
+                                    {
+                                        "key": "log_level",
+                                        "value": {
+                                            "stringValue": "DEBUG"
+                                        }
+                                    },
+                                    {
+                                        "key": "timestamp",
+                                        "value": {
+                                            "stringValue": "2025-04-02 08:42:31.017"
+                                        }
+                                    }
+                                ],
+                                "traceId": "",
+                                "spanId": ""
+                            },
+                            {
+                                "timeUnixNano": "1743554551017000000",
+                                "observedTimeUnixNano": "1743554551091371000",
+                                "body": {
+                                    "stringValue": "2025-04-02 08:42:31.017 [parallel-3] DEBUG [32465] [] c.h.d.d.s.i.HeartbeatServiceImpl - 心跳检查完成，发送ping消息: 0个"
+                                },
+                                "attributes": [
+                                    {
+                                        "key": "log.file.name",
+                                        "value": {
+                                            "stringValue": "dsp-tcp-gateway.log"
+                                        }
+                                    },
+                                    {
+                                        "key": "timestamp",
+                                        "value": {
+                                            "stringValue": "2025-04-02 08:42:31.017"
+                                        }
+                                    },
+                                    {
+                                        "key": "log_level",
+                                        "value": {
+                                            "stringValue": "DEBUG"
+                                        }
+                                    }
+                                ],
+                                "traceId": "",
+                                "spanId": ""
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+]

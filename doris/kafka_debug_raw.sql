@@ -1,6 +1,7 @@
 CREATE TABLE kafka_debug_raw (
-    id BIGINT, -- 新增 id 列作为键列
-    raw_json TEXT -- 现在可以使用 TEXT/STRING 类型
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    raw_json TEXT, -- 现在可以使用 TEXT/STRING 类型
+    INDEX idx_message (`raw_json`) USING INVERTED PROPERTIES("parser" = "unicode", "support_phrase" = "true")
 )
 ENGINE=OLAP
 DUPLICATE KEY(id)
