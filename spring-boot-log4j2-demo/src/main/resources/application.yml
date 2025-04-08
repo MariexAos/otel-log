@@ -1,0 +1,12 @@
+# 服务器配置
+server:
+  port: 8000
+
+# 应用名称
+spring:
+  application:
+    name: spring-boot-log4j2-demo
+
+# 指定log4j2配置文件
+logging:
+  config: classpath:log4j2.xml 

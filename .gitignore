@@ -10,5 +10,8 @@ doris_fe_log
 doris_fe_meta
 .DS_Store
 
+.idea
+logs
+target
 otel-collector/otelcol
 otel-collector/otelcontribcol_darwin_arm64

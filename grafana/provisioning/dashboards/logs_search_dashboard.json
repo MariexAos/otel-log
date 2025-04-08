@@ -1,0 +1,361 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "grafana-doris-datasource",
+        "uid": "doris"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "content": "# 日志查询面板\n\n此面板用于查询和筛选系统日志。通过使用下方的变量选择器，可以按照时间范围、日志级别和关键词来过滤日志。",
+        "mode": "markdown"
+      },
+      "title": "使用说明",
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "grafana-doris-datasource",
+        "uid": "doris"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": []
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "log_level"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 100
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "ERROR": {
+                        "color": "red",
+                        "index": 2
+                      },
+                      "INFO": {
+                        "color": "green",
+                        "index": 0
+                      },
+                      "WARN": {
+                        "color": "orange",
+                        "index": 1
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "message"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 800
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "time"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 200
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 16,
+        "w": 24,
+        "x": 0,
+        "y": 4
+      },
+      "id": 2,
+      "options": {
+        "footer": {
+          "countRows": true,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": true
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "10.3.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-doris-datasource",
+            "uid": "doris"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawSql": "SELECT \n  log_time as time, \n  message, \n  COALESCE(JSON_EXTRACT(attributes, '$[?(@.key==\"log_level\")].value.stringValue'), 'INFO') as log_level,\n  trace_id, \n  span_id \nFROM otel_logs_v2 \nWHERE $__timeFilter(log_time) \n  AND (LOWER(message) LIKE LOWER('%$search_query%') OR '$search_query' = '') \n  AND (COALESCE(JSON_EXTRACT(attributes, '$[?(@.key==\"log_level\")].value.stringValue'), 'INFO') IN ($log_level) OR '$log_level' = '')\nORDER BY log_time DESC \nLIMIT 1000",
+          "refId": "A"
+        }
+      ],
+      "title": "日志查询结果",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-doris-datasource",
+        "uid": "doris"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "bars",
+            "fillOpacity": 50,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ERROR"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "WARN"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "INFO"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 20
+      },
+      "id": 3,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "10.3.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-doris-datasource",
+            "uid": "doris"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawSql": "SELECT\n  UNIX_TIMESTAMP(DATE_TRUNC('minute', log_time)) * 1000 as time,\n  COUNT(*) as value,\n  COALESCE(JSON_EXTRACT(attributes, '$[?(@.key==\"log_level\")].value.stringValue'), 'INFO') as metric\nFROM otel_logs_v2\nWHERE $__timeFilter(log_time)\n  AND (LOWER(message) LIKE LOWER('%$search_query%') OR '$search_query' = '')\n  AND (COALESCE(JSON_EXTRACT(attributes, '$[?(@.key==\"log_level\")].value.stringValue'), 'INFO') IN ($log_level) OR '$log_level' = '')\nGROUP BY DATE_TRUNC('minute', log_time), COALESCE(JSON_EXTRACT(attributes, '$[?(@.key==\"log_level\")].value.stringValue'), 'INFO')\nORDER BY time",
+          "refId": "A"
+        }
+      ],
+      "title": "日志级别统计",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": [
+    "logs",
+    "search"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "",
+          "value": ""
+        },
+        "description": "输入关键词搜索日志内容",
+        "hide": 0,
+        "label": "搜索关键词",
+        "name": "search_query",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "skipUrlSync": false,
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "grafana-doris-datasource",
+          "uid": "doris"
+        },
+        "definition": "SELECT DISTINCT COALESCE(JSON_EXTRACT(attributes, '$[?(@.key==\"log_level\")].value.stringValue'), 'INFO') FROM otel_logs_v2",
+        "description": "选择日志级别",
+        "hide": 0,
+        "includeAll": true,
+        "label": "日志级别",
+        "multi": true,
+        "name": "log_level",
+        "options": [],
+        "query": "SELECT DISTINCT COALESCE(JSON_EXTRACT(attributes, '$[?(@.key==\"log_level\")].value.stringValue'), 'INFO') FROM otel_logs_v2",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "日志查询面板",
+  "uid": "log-search",
+  "version": 1,
+  "weekStart": ""
+} 

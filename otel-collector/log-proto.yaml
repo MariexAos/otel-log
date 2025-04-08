@@ -1,6 +1,6 @@
 receivers:
   filelog:
-    include: ["/Users/mariexaos/logs/dsp-tcp-gateway/dsp-tcp-gateway.log"]
+    include: ["./../spring-boot-log4j2-demo/logs/*.log"]
     start_at: "end"
     operators:
       - type: regex_parser
@@ -10,6 +10,12 @@ receivers:
           parse_from: attributes.timestamp
       - type: severity_parser
         parse_from: attributes.log_level
+      - type: remove                         #  清除log_level(已用作 severity)
+        field: attributes["log_level"]
+      - type: remove                         # 清除时间字符串字段（已用作 timeUnixNano）
+        field: attributes["timestamp"]
+      - type: remove                         # 清除日志文件名
+        field: attributes["log.file.name"]      
 processors:
   # resource:
   #   attributes:
@@ -28,8 +34,8 @@ processors:
 exporters:
   kafka:
     brokers: ["127.0.0.1:9092"]
-    topic: "otel-logs"
-    encoding: "otlp_json"
+    topic: "otel-proto"
+    encoding: "otlp_proto"
 
 service:
   pipelines:
