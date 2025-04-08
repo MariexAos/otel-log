@@ -54,7 +54,6 @@ docker-compose up -d
 ```
 
 ### 部署 Doris
-
 ```bash
 使用selectDB Manager部署
 ```
@@ -148,3 +147,8 @@ docker-compose up -d
 1. 代码符合项目编码规范
 2. 测试通过所有测试用例
 3. 提供必要的文档说明
+
+
+## 参考文档
+1. [selectdb manager](https://selectdb.com/download/enterprise)
+2. [otlp collector](https://opentelemetry.io/docs/collector)
