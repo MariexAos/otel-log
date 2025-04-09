@@ -13,5 +13,6 @@ doris_fe_meta
 .idea
 logs
 target
+grafana/data
 otel-collector/otelcol
 otel-collector/otelcontribcol_darwin_arm64

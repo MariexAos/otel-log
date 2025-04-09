@@ -1,15 +1,11 @@
 package com.example.otelkafkastreams.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Data
 @Builder
@@ -40,4 +36,20 @@ public class LogEntity {
      * json 字符串
      */
     private String attributes;
-} 
+    /**
+     * 集群名称
+     */
+    private String cluster;
+    /**
+     * 命名空间
+     */
+    private String namespace;
+    /**
+     * pod名称
+     */
+    private String pod;
+    /**
+     * 容器名称
+     */
+    private String container;
+}

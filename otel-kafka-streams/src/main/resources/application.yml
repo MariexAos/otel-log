@@ -56,4 +56,12 @@ management:
         include: health,info,metrics
   endpoint:
     health:
-      show-details: always 
+      show-details: always
+
+otel:
+  log:
+    extract-attributes:
+      cluster: k8s.cluster.name
+      namespace: k8s.namespace.name
+      pod: k8s.pod.name
+      container: k8s.container.name

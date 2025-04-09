@@ -4,8 +4,19 @@ CREATE TABLE IF NOT EXISTS `otel_logs_test` (
                                                 `body` TEXT COMMENT '内容',
                                                 `attributes` JSON COMMENT '属性',
                                                 `trace_id` TEXT COMMENT '追踪ID',
-                                                `span_id` TEXT COMMENT '跨度ID'
-)
+                                                `span_id` TEXT COMMENT '跨度ID',
+                                                `cluster` TEXT COMMENT '集群名称',
+                                                `namespace` TEXT COMMENT '命名空间',
+                                                `pod` TEXT COMMENT 'pod名称',
+                                                `container` TEXT COMMENT '容器名称',
+                                                INDEX idx_body (`body`) USING INVERTED PROPERTIES("parser" = "unicode", "support_phrase" = "true"),
+                                                INDEX idx_trace_id(`trace_id`) USING INVERTED,
+                                                INDEX idx_severity(`severity`) USING INVERTED,
+                                                INDEX idx_cluster(`cluster`) USING INVERTED,
+                                                INDEX idx_namespace(`namespace`) USING INVERTED,
+                                                INDEX idx_pod(`pod`) USING INVERTED,
+                                                INDEX idx_container(`container`) USING INVERTED
+    )
     ENGINE=OLAP
     DUPLICATE KEY(`timestamp`)
     PARTITION BY RANGE(`timestamp`) ()

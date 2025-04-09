@@ -1,5 +1,6 @@
 package com.example.otelkafkastreams.processor;
 
+import com.example.otelkafkastreams.config.OtelLogProperties;
 import com.example.otelkafkastreams.model.LogEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.opentelemetry.proto.common.v1.KeyValue;
@@ -16,6 +17,11 @@ import java.util.Map;
 @Slf4j
 public class LogRecordTransformer {
     private static final ObjectMapper objectMapper = new ObjectMapper();
+    private final OtelLogProperties otelLogProperties;
+
+    public LogRecordTransformer(OtelLogProperties otelLogProperties) {
+        this.otelLogProperties = otelLogProperties;
+    }
 
     public LogEntity transform(LogRecord log) {
         // 1. timestamp 纳秒转 LocalDateTime（UTC 可改为 Asia/Shanghai）
@@ -55,6 +61,10 @@ public class LogRecordTransformer {
                 .traceId(traceId)
                 .spanId(spanId)
                 .attributes(attributesJson)
+                .cluster(attrMap.getOrDefault(otelLogProperties.getExtractAttributes().getCluster(), "").toString())
+                .namespace(attrMap.getOrDefault(otelLogProperties.getExtractAttributes().getNamespace(), "").toString())
+                .pod(attrMap.getOrDefault(otelLogProperties.getExtractAttributes().getPod(), "").toString())
+                .container(attrMap.getOrDefault(otelLogProperties.getExtractAttributes().getContainer(), "").toString())
                 .build();
     }
 
