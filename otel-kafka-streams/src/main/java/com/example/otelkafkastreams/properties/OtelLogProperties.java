@@ -1,4 +1,4 @@
-package com.example.otelkafkastreams.config;
+package com.example.otelkafkastreams.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

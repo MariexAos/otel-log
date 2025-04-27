@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: otel-kafka-streams
+    name: log-transfer-application
 
   # Kafka Streams配置
   kafka:
@@ -11,11 +11,24 @@ spring:
     streams:
       application-id: ${spring.application.name}
       properties:
-        processing.guarantee: exactly_once_v2  # 保证exactly once语义
-        commit.interval.ms: 10000              # 提交间隔，根据实际情况调整
-        state.dir: ${user.home}/kafka-streams/${spring.application.name}
+        # 基础流处理参数
+        commit.interval.ms: 5000              # 5秒提交一次offset + state checkpoint（适度频率）
+        cache.max.bytes.buffering: 10485760    # 10MB缓冲区，够了，避免频繁flush
+        num.stream.threads: 2                  # 每个实例2个线程（可以根据pod资源扩大）
+        processing.guarantee: at_least_once    # 日志存储场景一般不需要exactly_once（提高性能）
+
+        # 优化输入拉取
+        fetch.min.bytes: 1048576               # 1MB批量拉取，减少小消息带来的拉取次数
+        fetch.max.wait.ms: 500                 # 最多等待500ms凑齐批次
+
+        # 底层rockdb配置无所谓，因为已经用inMemory
+        state.dir: /tmp/kafka-streams           # 临时目录，随便扔
     consumer:
       auto-offset-reset: earliest
+    properties:
+      default.key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+      default.value.serde: org.apache.kafka.common.serialization.Serdes$ByteArraySerde
+
   # Doris数据库连接配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -43,11 +56,9 @@ application:
     input-topic: otel-proto
   doris:
     table-name: otel_logs_test
-    batch-size: 500         # 批处理大小
-    batch-interval-ms: 1000   # 批处理时间间隔
-  log-buffer:
-    persistence-enabled: true # 是否启用持久化
-    persistence-file: ${user.home}/log-buffer/${spring.application.name}/buffer.json
+  window:
+    size-seconds: 10          # 窗口大小，单位秒
+    max-records: 1000         # 触发批处理的最大记录数
 
 management:
   endpoints:
@@ -65,3 +76,7 @@ otel:
       namespace: k8s.namespace.name
       pod: k8s.pod.name
       container: k8s.container.name
+
+logging:
+  level:
+    root: info

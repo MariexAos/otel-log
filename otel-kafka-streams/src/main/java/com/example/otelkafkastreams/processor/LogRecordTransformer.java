@@ -1,6 +1,6 @@
 package com.example.otelkafkastreams.processor;
 
-import com.example.otelkafkastreams.config.OtelLogProperties;
+import com.example.otelkafkastreams.properties.OtelLogProperties;
 import com.example.otelkafkastreams.model.LogEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.opentelemetry.proto.common.v1.KeyValue;
@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
+
 @Service
 @Slf4j
 public class LogRecordTransformer {
@@ -24,10 +25,12 @@ public class LogRecordTransformer {
     }
 
     public LogEntity transform(LogRecord log) {
-        // 1. timestamp 纳秒转 LocalDateTime（UTC 可改为 Asia/Shanghai）
+        // 1. timestamp 纳秒转 LocalDateTime（使用系统默认时区）
         long timeNano = log.getTimeUnixNano();
-        Instant instant = Instant.ofEpochSecond(timeNano / 1_000_000_000L, timeNano % 1_000_000_000L);
-        LocalDateTime timestamp = LocalDateTime.ofInstant(instant, ZoneId.of("Asia/Shanghai"));
+        LocalDateTime timestamp = Instant
+                .ofEpochSecond(0, timeNano)   // 纳秒偏移一次性传入
+                .atZone(ZoneId.systemDefault())           // 使用系统默认时区
+                .toLocalDateTime();
 
         // 2. body 内容（string 类型）
         String body = log.hasBody() ? log.getBody().getStringValue() : null;
@@ -36,8 +39,8 @@ public class LogRecordTransformer {
         String severity = log.getSeverityText();
 
         // 4. trace/spanId
-        String traceId = log.getTraceId().isEmpty() ? null : bytesToHex(log.getTraceId().toByteArray());
-        String spanId = log.getSpanId().isEmpty() ? null : bytesToHex(log.getSpanId().toByteArray());
+        String traceId = log.getTraceId().isEmpty() ? null : log.getTraceId().toStringUtf8();
+        String spanId = log.getSpanId().isEmpty() ? null : log.getSpanId().toStringUtf8();
 
         // 5. attributes → Map<String, Object> → JSON
         Map<String, Object> attrMap = new HashMap<>();
@@ -66,13 +69,5 @@ public class LogRecordTransformer {
                 .pod(attrMap.getOrDefault(otelLogProperties.getExtractAttributes().getPod(), "").toString())
                 .container(attrMap.getOrDefault(otelLogProperties.getExtractAttributes().getContainer(), "").toString())
                 .build();
-    }
-
-    // traceId / spanId 为 byte[]，转换为 hex string
-    private static String bytesToHex(byte[] bytes) {
-        StringBuilder sb = new StringBuilder();
-        for (byte b : bytes)
-            sb.append(String.format("%02x", b));
-        return sb.toString();
     }
 }

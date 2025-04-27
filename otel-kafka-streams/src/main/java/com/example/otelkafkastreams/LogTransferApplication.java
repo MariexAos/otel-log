@@ -8,9 +8,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableScheduling
 @EnableConfigurationProperties
-public class OtelStreamsApplication {
+public class LogTransferApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(OtelStreamsApplication.class, args);
+        SpringApplication.run(LogTransferApplication.class, args);
     }
 } 
