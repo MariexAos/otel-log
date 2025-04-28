@@ -11,7 +11,7 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.example.otel</groupId>
+    <groupId>com.hzbankweatlh.otel</groupId>
     <artifactId>observa-flow</artifactId>
     <version>1.0.0</version>
     <name>observa-flow</name>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.otel.observaflow.mapper.LogMapper">
+    <!-- 批量插入日志记录 -->
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO ${tableName} (
+            timestamp, body, severity, trace_id, span_id, attributes, cluster, namespace, pod, container
+        ) VALUES 
+        <foreach collection="list" item="log" separator=",">
+            (
+                #{log.timestamp},
+                #{log.body},
+                #{log.severity},
+                #{log.traceId},
+                #{log.spanId},
+                #{log.attributes},
+                #{log.cluster},
+                #{log.namespace},
+                #{log.pod},
+                #{log.container}
+            )
+        </foreach>
+    </insert>
+</mapper> 
