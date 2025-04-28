@@ -106,7 +106,11 @@ public class StreamProcessorServiceImpl implements StreamProcessorService {
                     // 如果达到了消息数量阈值，触发处理并清空列表
                     if (aggregate.size() >= windowMaxRecords) {
                         log.info("Message count threshold reached: {} records. Triggering batch processing.", aggregate.size());
-                        logSinkConnector.processBatch(aggregate);
+                        try {
+                            logSinkConnector.processBatch(aggregate);
+                        } catch (Exception e) {
+                            log.error("Error processing message: {}", e.getMessage(), e);
+                        }
                         return new ArrayList<>();
                     }
                     return aggregate;

@@ -27,6 +27,9 @@ public class LogRecordTransformer {
     public LogEntity transform(LogRecord log) {
         // 1. timestamp 纳秒转 LocalDateTime（使用系统默认时区）
         long timeNano = log.getTimeUnixNano();
+        if (timeNano == 0L) {
+            timeNano = log.getObservedTimeUnixNano();
+        }
         LocalDateTime timestamp = Instant
                 .ofEpochSecond(0, timeNano)   // 纳秒偏移一次性传入
                 .atZone(ZoneId.systemDefault())           // 使用系统默认时区
@@ -47,7 +50,7 @@ public class LogRecordTransformer {
         for (KeyValue kv : log.getAttributesList()) {
             String key = kv.getKey();
             if (kv.hasValue()) {
-                attrMap.put(key,kv.getValue().toString());
+                attrMap.put(key,kv.getValue().getStringValue());
             }
         }
         String attributesJson = "{}";

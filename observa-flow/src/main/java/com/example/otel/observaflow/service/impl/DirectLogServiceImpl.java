@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -34,7 +33,6 @@ public class DirectLogServiceImpl implements LogStoreService {
     /**
      * 直接处理日志批次，立即写入数据库
      */
-    @Transactional
     public void processBatch(List<LogEntity> logs) {
         if (CollectionUtil.isEmpty(logs)) {
             return;

@@ -10,10 +10,12 @@ GIT_COMMIT=$(git rev-parse --short=7 HEAD)
 APP_VERSION=${APP_VERSION:-$GIT_COMMIT}
 # 镜像完整名
 IMAGE_NAME="$REGISTRY/$APP_NAME:$APP_VERSION"
+LATEST_IMAGE_NAME="$REGISTRY/$APP_NAME:latest"
 
 docker buildx build \
   --file Dockerfile \
   --platform $PLATFORMS \
   --load \
   --tag $IMAGE_NAME \
+  --tag $LATEST_IMAGE_NAME \
   .

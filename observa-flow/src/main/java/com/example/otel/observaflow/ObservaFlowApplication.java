@@ -8,9 +8,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableScheduling
 @EnableConfigurationProperties
-public class LogTransferApplication {
+public class ObservaFlowApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(LogTransferApplication.class, args);
+        SpringApplication.run(ObservaFlowApplication.class, args);
     }
 } 
