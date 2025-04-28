@@ -1,4 +1,4 @@
-# OTEL Kafka Streams to Doris
+# ObservaFlow
 
 基于Spring Boot和Kafka Streams的应用，用于将OpenTelemetry JSON数据写入Apache Doris数据库。
 
