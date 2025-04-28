@@ -16,3 +16,5 @@ target
 grafana/data
 otel-collector/otelcol
 otel-collector/otelcontribcol_darwin_arm64
+
+tmp
