@@ -1,8 +1,8 @@
 package com.example.demo.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,13 +12,13 @@ import com.example.demo.service.LogDemoService;
 
 @RestController
 @RequestMapping("/api/logs")
+@RequiredArgsConstructor
 public class LogDemoController {
 
     // 获取Logger实例
     private static final Logger logger = LogManager.getLogger(LogDemoController.class);
     
-    @Autowired
-    private LogDemoService logDemoService;
+    private final LogDemoService logDemoService;
 
     @GetMapping("/test")
     public String testLogs(@RequestParam(defaultValue = "测试") String message) {
@@ -28,6 +28,7 @@ public class LogDemoController {
         logger.info("这是一条INFO级别的日志: {}", message);
         logger.warn("这是一条WARN级别的日志: {}", message);
         logger.error("这是一条ERROR级别的日志: {}", message);
+        logger.info(String.format("资金回帐: %s", message));
         
         return "日志已打印，请查看控制台或日志文件";
     }

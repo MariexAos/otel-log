@@ -7,7 +7,7 @@ spring:
 
   # Kafka Streams配置
   kafka:
-    bootstrap-servers: host.orb.internal:9092
+    bootstrap-servers: kafka.kafka.orb.local:9092
     streams:
       application-id: ${spring.application.name}
       properties:
@@ -16,7 +16,7 @@ spring:
         cache.max.bytes.buffering: 10485760    # 10MB缓冲区，够了，避免频繁flush
         num.stream.threads: 2                  # 每个实例2个线程（可以根据pod资源扩大）
         processing.guarantee: at_least_once    # 日志存储场景一般不需要exactly_once（提高性能）
-
+        state.store.changelog.logging.enable: false # 对应 StreamsConfig.STATESTORE_CHANGELOGGING_ENABLE_CONFIG，日志场景不需要changelog
         # 优化输入拉取
         fetch.min.bytes: 1048576               # 1MB批量拉取，减少小消息带来的拉取次数
         fetch.max.wait.ms: 500                 # 最多等待500ms凑齐批次
@@ -32,7 +32,7 @@ spring:
   # Doris数据库连接配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:9030/log_db
+    url: jdbc:mysql://ubuntu.orb.local:9030/log_db
     username: root
     password: root@1234
     hikari:

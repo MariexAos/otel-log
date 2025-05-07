@@ -1,15 +1,17 @@
-FROM openjdk:17-jdk-slim
-# 环境变量（可根据需要添加）
-ENV TZ=Asia/Shanghai \
-    LANG=C.UTF-8 \
-    JAVA_OPTS=""
+FROM maven:3.9.6-eclipse-temurin-17 AS builder
+WORKDIR /build
+
+# 复制 Maven 配置和源代码
+COPY pom.xml .
+COPY src ./src
+
+RUN mvn clean package -DskipTests
+
+FROM gcr.io/distroless/java17-debian11:nonroot
 
 WORKDIR /app
 
-COPY target/observa-flow.jar observa-flow.jar
+# 只复制打包后的 JAR 文件
+COPY --from=builder /build/target/observa-flow.jar observa-flow.jar
 
-# 健康检查（可选但推荐）
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD curl -f http://localhost:8080/actuator/health || exit 1
-
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar observa-flow.jar"]
+ENTRYPOINT ["java", "-jar", "observa-flow.jar"]

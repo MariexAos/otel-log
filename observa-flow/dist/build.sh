@@ -3,9 +3,8 @@
 set -euo pipefail
 
 # 应用名称，默认取目录名
-APP_NAME=${APP_NAME:-"observa-flow"}
-
 REGISTRY=${REGISTRY:-"opentelemetry"}
+APP_NAME=${APP_NAME:-"observa-flow"}
 
 # 当前git commit短ID作为默认版本号
 GIT_COMMIT=$(git rev-parse --short=7 HEAD)
@@ -19,7 +18,7 @@ IMAGE_NAME="$REGISTRY/$APP_NAME:$APP_VERSION"
 LATEST_IMAGE_NAME="$REGISTRY/$APP_NAME:latest"
 
 echo "----------------------------------------"
-echo "Building Docker image: $IMAGE_NAME for environment: $TARGET_ENV"
+echo "Building Docker image: $IMAGE_NAME"
 echo "----------------------------------------"
 
 # 确保buildx builder存在
@@ -31,8 +30,8 @@ docker buildx build \
   --file dist/Dockerfile \
   --platform $PLATFORMS \
   --load \
-  --tag $IMAGE_NAME \
-  --tag $LATEST_IMAGE_NAME \
+  --tag "$IMAGE_NAME" \
+  --tag "$LATEST_IMAGE_NAME" \
   .
 
 echo "----------------------------------------"

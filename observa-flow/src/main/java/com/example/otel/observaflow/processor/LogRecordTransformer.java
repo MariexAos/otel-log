@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 @Service
 @Slf4j
@@ -32,7 +32,7 @@ public class LogRecordTransformer {
         }
         LocalDateTime timestamp = Instant
                 .ofEpochSecond(0, timeNano)   // 纳秒偏移一次性传入
-                .atZone(ZoneId.systemDefault())           // 使用系统默认时区
+                .atZone(TimeZone.getTimeZone("Asia/Shanghai").toZoneId())           // 使用系统默认时区
                 .toLocalDateTime();
 
         // 2. body 内容（string 类型）

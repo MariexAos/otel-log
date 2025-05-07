@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS `otel_logs_test` (
-                                                `timestamp` DATETIME COMMENT '日志时间',
+                                                `timestamp` DATETIME(6) COMMENT '日志时间',
                                                 `severity` TEXT COMMENT '日志级别',
                                                 `body` TEXT COMMENT '内容',
                                                 `attributes` JSON COMMENT '属性',
