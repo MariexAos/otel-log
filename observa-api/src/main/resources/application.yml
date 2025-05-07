@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: observa-api
+  # Doris数据库连接配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://ubuntu.orb.local:9030/log_db
+    username: root
+    password: root@1234
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+logging:
+  level:
+    org.springframework.jdbc.core: DEBUG
+    org.springframework.jdbc.core.JdbcTemplate: DEBUG
+    org.springframework.jdbc.support: DEBUG
+    com.baomidou.mybatisplus: DEBUG  # 打印 MyBatis-Plus 日志
+    com.hzbankwealth.observa.api.mapper: DEBUG        # 你自己的 Mapper 包
+    org.mybatis: DEBUG               # 可选，MyBatis 核心日志

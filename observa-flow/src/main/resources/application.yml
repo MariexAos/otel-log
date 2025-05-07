@@ -1,0 +1,82 @@
+server:
+  port: 18080
+
+spring:
+  application:
+    name: log-transfer-application
+
+  # Kafka Streams配置
+  kafka:
+    bootstrap-servers: kafka.kafka.orb.local:9092
+    streams:
+      application-id: ${spring.application.name}
+      properties:
+        # 基础流处理参数
+        commit.interval.ms: 5000              # 5秒提交一次offset + state checkpoint（适度频率）
+        cache.max.bytes.buffering: 10485760    # 10MB缓冲区，够了，避免频繁flush
+        num.stream.threads: 2                  # 每个实例2个线程（可以根据pod资源扩大）
+        processing.guarantee: at_least_once    # 日志存储场景一般不需要exactly_once（提高性能）
+        state.store.changelog.logging.enable: false # 对应 StreamsConfig.STATESTORE_CHANGELOGGING_ENABLE_CONFIG，日志场景不需要changelog
+        # 优化输入拉取
+        fetch.min.bytes: 1048576               # 1MB批量拉取，减少小消息带来的拉取次数
+        fetch.max.wait.ms: 500                 # 最多等待500ms凑齐批次
+
+        # 底层rockdb配置无所谓，因为已经用inMemory
+        state.dir: /tmp/kafka-streams           # 临时目录，随便扔
+    consumer:
+      auto-offset-reset: earliest
+    properties:
+      default.key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+      default.value.serde: org.apache.kafka.common.serialization.Serdes$ByteArraySerde
+
+  # Doris数据库连接配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://ubuntu.orb.local:9030/log_db
+    username: root
+    password: root@1234
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+# MyBatis配置
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.example.otelkafkastreams.model
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+
+# 应用自定义配置
+application:
+  kafka:
+    input-topic: otel-proto
+  doris:
+    table-name: otel_logs_test
+  window:
+    size-seconds: 10          # 窗口大小，单位秒
+    max-records: 1000         # 触发批处理的最大记录数
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+otel:
+  log:
+    extract-attributes:
+      cluster: k8s.cluster.name
+      namespace: k8s.namespace.name
+      pod: k8s.pod.name
+      container: k8s.container.name
+
+logging:
+  level:
+    root: info

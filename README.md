@@ -54,7 +54,6 @@ docker-compose up -d
 ```
 
 ### 部署 Doris
-
 ```bash
 使用selectDB Manager部署
 ```
@@ -129,9 +128,9 @@ docker-compose up -d
 - [x] Kafka Streams 处理服务
 - [x] Doris 表设计与部署
 - [x] 基础日志查询功能 (通过 Doris WebUI)
+- [x] OTEL Collector 与 K8s 控制面对接：自动采集 Pod 日志和元数据
 
 ### 进行中
-- [ ] OTEL Collector 与 K8s 控制面对接：自动采集 Pod 日志和元数据
 - [ ] 查询页面开发：替代 WebUI，提供更友好的查询界面
 - [ ] 日志分析性能优化
 
@@ -148,3 +147,8 @@ docker-compose up -d
 1. 代码符合项目编码规范
 2. 测试通过所有测试用例
 3. 提供必要的文档说明
+
+
+## 参考文档
+1. [selectdb manager](https://selectdb.com/download/enterprise)
+2. [otlp collector](https://opentelemetry.io/docs/collector)

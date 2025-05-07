@@ -1,39 +1,41 @@
 receivers:
   filelog:
-    include: ["./../spring-boot-log4j2-demo/logs/*.log"]
-    start_at: "end"
+    include:
+      - /var/log/pods/*/*/*.log
+    start_at: end
+    encoding: utf-8
+    include_file_name: true
+    include_file_path: true
+    preserve_trailing_whitespaces: true
+    preserve_leading_whitespaces: false
+
     operators:
       - type: regex_parser
         regex: '^(?P<timestamp>\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.\d{3})\s+\[[^\]]+\]\s+(?P<log_level>\S+).*$'
+        on_error: send
         timestamp:
           layout: '%Y-%m-%d %H:%M:%S'
           parse_from: attributes.timestamp
       - type: severity_parser
         parse_from: attributes.log_level
-      - type: remove                         #  清除log_level(已用作 severity)
+        on_error: send
+      - type: remove
         field: attributes["log_level"]
-      - type: remove                         # 清除时间字符串字段（已用作 timeUnixNano）
+        if_exists: true
+      - type: remove
         field: attributes["timestamp"]
-      - type: remove                         # 清除日志文件名
-        field: attributes["log.file.name"]      
+        if_exists: true
+      - type: remove
+        field: attributes["log.file.name"]
+        if_exists: true
+
 processors:
-  # resource:
-  #   attributes:
-  #     - key: service.name
-  #       value: "${SERVICE_NAME:default-service}"      # 从环境变量获取 k8s service.name
-  #       action: upsert
-  #     - key: instance.id
-  #       value: "${INSTANCE_ID:default-INSTANCE_ID}"       # 从环境变量获取 k8s instance id (Pod 名称)
-  #       action: upsert
   batch:
     timeout: 10s
-  # transform/logid:
-  #   log_statements:
-  #     - set(attributes.log_id, GenerateUUID())
 
 exporters:
   kafka:
-    brokers: ["127.0.0.1:9092"]
+    brokers: ["kafka.kafka.orb.local:9092"]
     topic: "otel-proto"
     encoding: "otlp_proto"
 
@@ -41,6 +43,5 @@ service:
   pipelines:
     logs:
       receivers: [filelog]
-      # processors: [resource, batch, transform/logid]
       processors: [batch]
-      exporters: [kafka]
+      exporters: [kafka]  
