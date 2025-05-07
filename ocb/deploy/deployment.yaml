@@ -1,0 +1,69 @@
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: otel-collector
+  namespace: observa-system
+  labels:
+    app: otel-collector
+  annotations:
+    deprecated.daemonset.template.generation: '37'
+    kubesphere.io/creator: admin
+spec:
+  selector:
+    matchLabels:
+      app: otel-collector
+  template:
+    metadata:
+      labels:
+        app: otel-collector
+
+    spec:
+      volumes:
+        - name: log-path
+          hostPath:
+            path: /var/log
+            type: ''
+        - name: volume-lc50jo
+          configMap:
+            name: otelcol-config
+            defaultMode: 420
+        - name: docker-path
+          hostPath:
+            path: /var/lib/docker/containers
+            type: ''
+      containers:
+        - name: otel-collector
+          image: 'opentelemetry/otelcol:1b58047'
+          args:
+            - '--config=/etc/otel/collector-config.yaml'
+          ports:
+            - name: tcp-0
+              containerPort: 4317
+              protocol: TCP
+          resources: {}
+          volumeMounts:
+            - name: log-path
+              readOnly: true
+              mountPath: /var/log
+            - name: volume-lc50jo
+              readOnly: true
+              mountPath: /etc/otel/collector-config.yaml
+              subPath: collector-config.yaml
+            - name: docker-path
+              readOnly: true
+              mountPath: /var/lib/docker/containers
+          terminationMessagePath: /dev/termination-log
+          imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      serviceAccountName: default
+      serviceAccount: default
+      securityContext: {}
+      schedulerName: default-scheduler
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 20%
+      maxSurge: 0
+  revisionHistoryLimit: 10
