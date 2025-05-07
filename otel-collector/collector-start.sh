@@ -1,1 +1,1 @@
-./otelcontribcol_darwin_arm64 --config=log-proto.yaml
+./otelcontribcol_darwin_arm64 --config=cri-config.yaml
