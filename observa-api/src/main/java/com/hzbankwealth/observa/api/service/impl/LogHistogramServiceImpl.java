@@ -1,25 +1,45 @@
 package com.hzbankwealth.observa.api.service.impl;
 
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.hzbankwealth.observa.api.mapper.LogMapper;
+import com.hzbankwealth.observa.api.model.LogEntity;
 import com.hzbankwealth.observa.api.model.logging.Bucket;
 import com.hzbankwealth.observa.api.model.logging.Histogram;
 import com.hzbankwealth.observa.api.service.LogHistogramService;
 import com.hzbankwealth.observa.api.util.QueryUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class LogHistogramServiceImpl implements LogHistogramService {
 
-    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    private final LogMapper logMapper;
+
+    private LocalDateTime[] getDefaultTimeRange(String intervalUnit) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startTime;
+        
+        switch (intervalUnit) {
+            case "s" -> startTime = now.minusHours(1);
+            case "m" -> startTime = now.minusHours(6);
+            case "d" -> startTime = now.minusDays(7);
+            case "M" -> startTime = now.minusMonths(10);
+            case "y" -> startTime = now.minusYears(1);
+            default -> startTime = now.minusHours(24);
+        }
+        
+        return new LocalDateTime[]{startTime, now};
+    }
 
     @Override
     public Histogram getHistogram(
@@ -27,62 +47,83 @@ public class LogHistogramServiceImpl implements LogHistogramService {
             String pods, String podQuery,
             String containers, String containerQuery,
             String logQuery,
-            String startTime, String endTime,
+            LocalDateTime startTime, LocalDateTime endTime,
             String interval, String cluster) {
         
         // 解析时间间隔
-        int intervalValue = 15;
         String intervalUnit = "m";
         
-        if (StringUtils.hasText(interval)) {
-            var matcher = QueryUtil.INTERVAL_PATTERN.matcher(interval);
-            if (matcher.matches()) {
-                intervalValue = Integer.parseInt(matcher.group(1));
-                intervalUnit = matcher.group(2);
+        if (StrUtil.isNotBlank(interval) && interval.length() > 1) {
+            intervalUnit = interval.substring(interval.length() - 1);
+        } 
+        
+        // 如果没有指定时间范围，根据时间单位设置默认范围
+        if (startTime == null || endTime == null) {
+            LocalDateTime[] defaultRange = getDefaultTimeRange(intervalUnit);
+            if (startTime == null) {
+                startTime = defaultRange[0];
+            }
+            if (endTime == null) {
+                endTime = defaultRange[1];
             }
         }
         
-        // 转换为SQL间隔表达式
-        String sqlIntervalExpr = switch (intervalUnit) {
-            case "s" -> intervalValue + " SECOND";
-            case "m" -> intervalValue + " MINUTE";
-            case "h" -> intervalValue + " HOUR";
-            case "d" -> intervalValue + " DAY";
-            case "w" -> (intervalValue * 7) + " DAY";
-            case "M" -> intervalValue + " MONTH";
-            case "q" -> (intervalValue * 3) + " MONTH";
-            case "y" -> intervalValue + " YEAR";
-            default -> "15 MINUTE";
+        // 转换为时间格式
+        String timeFormat = switch (intervalUnit) {
+            case "s" -> "%Y-%m-%d %H:%i:%s";
+            case "m" -> "%Y-%m-%d %H:%i:00";
+            case "d" -> "%Y-%m-%d 00:00:00";
+            case "M" -> "%Y-%m-01 00:00:00";
+            case "y" -> "%Y-01-01 00:00:00";
+            default -> "%Y-%m-%d %H:00:00";
         };
         
-        // 解析时间范围
-        LocalDateTime startDateTime = QueryUtil.parseTimestamp(startTime);
-        LocalDateTime endDateTime = QueryUtil.parseTimestamp(endTime);
+        // 构建查询条件
+        LambdaQueryWrapper<LogEntity> wrapper = Wrappers.lambdaQuery();
         
-        // 构建直方图查询
-        StringBuilder histogramSql = new StringBuilder(
-                "SELECT UNIX_TIMESTAMP(time_bucket) as time_bucket, COUNT(*) as count FROM (" +
-                "  SELECT DATE_TRUNC('" + sqlIntervalExpr.split(" ")[1] + "', timestamp) as time_bucket " +
-                "  FROM otel_logs_test WHERE 1=1");
+        // 应用过滤条件
+        if (StrUtil.isNotBlank(cluster)) {
+            wrapper.eq(LogEntity::getCluster, cluster);
+        }
         
-        MapSqlParameterSource params = new MapSqlParameterSource();
+        if (StrUtil.isNotBlank(namespaces)) {
+            wrapper.in(LogEntity::getNamespace, QueryUtil.splitAndTrim(namespaces));
+        } else if (StrUtil.isNotBlank(namespaceQuery)) {
+            wrapper.like(LogEntity::getNamespace, namespaceQuery);
+        }
         
-        // 添加过滤条件
-        StringBuilder dummySql = new StringBuilder(); // 未使用，仅为复用applyFilters方法
-        QueryUtil.applyFilters(dummySql, histogramSql, params,
-                namespaces, namespaceQuery,
-                pods, podQuery, containers, containerQuery, 
-                logQuery, startTime, endTime, cluster);
+        if (StrUtil.isNotBlank(pods)) {
+            wrapper.in(LogEntity::getPod, QueryUtil.splitAndTrim(pods));
+        } else if (StrUtil.isNotBlank(podQuery)) {
+            wrapper.like(LogEntity::getPod, podQuery);
+        }
         
-        histogramSql.append(") AS t GROUP BY time_bucket ORDER BY time_bucket");
+        if (StrUtil.isNotBlank(containers)) {
+            wrapper.in(LogEntity::getContainer, QueryUtil.splitAndTrim(containers));
+        } else if (StrUtil.isNotBlank(containerQuery)) {
+            wrapper.like(LogEntity::getContainer, containerQuery);
+        }
         
-        // 执行查询
-        List<Bucket> buckets = namedParameterJdbcTemplate.query(histogramSql.toString(), params, (rs, rowNum) -> {
-            return Bucket.builder()
-                    .time(rs.getLong("time_bucket"))
-                    .count(rs.getLong("count"))
-                    .build();
-        });
+        if (StrUtil.isNotBlank(logQuery)) {
+            wrapper.like(LogEntity::getBody, logQuery);
+        }
+        
+        if (startTime != null) {
+            wrapper.ge(LogEntity::getTimestamp, startTime);
+        }
+        
+        if (endTime != null) {
+            wrapper.le(LogEntity::getTimestamp, endTime);
+        }
+        
+        // 执行查询并收集结果
+        List<Map<String, Object>> results = logMapper.selectTimeBucketStats(timeFormat, wrapper);
+        List<Bucket> buckets = results.stream()
+                .map(map -> Bucket.builder()
+                        .time((String) map.get("time_bucket"))
+                        .count((Long) map.get("count"))
+                        .build())
+                .collect(Collectors.toList());
         
         // 计算总数
         long total = buckets.stream().mapToLong(Bucket::getCount).sum();

@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 @Builder
 public class Bucket {
-    private long time;
+    private String time;
     private long count;
 } 

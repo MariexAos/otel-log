@@ -54,7 +54,7 @@ public class LogController {
                 ? LocalDateTime.parse(startTime, formatter)
                 : null; // 默认值
 
-        LocalDateTime endLocalTime = StrUtil.isNotBlank(startTime)
+        LocalDateTime endLocalTime = StrUtil.isNotBlank(endTime)
                 ? LocalDateTime.parse(endTime, formatter)
                 : LocalDateTime.now();
 
@@ -70,7 +70,7 @@ public class LogController {
             case "histogram" -> ResponseEntity.ok(logHistogramService.getHistogram(
                     namespaces, namespaceQuery, 
                     pods, podQuery, containers, containerQuery, logQuery,
-                    startTime, endTime, interval, cluster));
+                    startLocalTime, endLocalTime, interval, cluster));
             case "export" -> ResponseEntity.ok(logExportService.exportLogs(
                     namespaces, namespaceQuery, 
                     pods, podQuery, containers, containerQuery, logQuery,
