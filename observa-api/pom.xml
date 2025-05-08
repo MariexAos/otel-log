@@ -8,7 +8,7 @@
         <version>3.4.5</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.hzbankwealth.observa</groupId>
+    <groupId>com.example.observa</groupId>
     <artifactId>observa-api</artifactId>
     <version>1.0.0</version>
     <name>observa-api</name>
