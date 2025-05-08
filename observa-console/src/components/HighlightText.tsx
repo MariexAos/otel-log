@@ -1,5 +1,7 @@
 import React from 'react';
-import { Box } from '@mui/material';
+import { Typography } from 'antd';
+
+const { Text } = Typography;
 
 interface HighlightTextProps {
   text: string;
@@ -17,18 +19,17 @@ const HighlightText: React.FC<HighlightTextProps> = ({ text, highlight }) => {
     <>
       {parts.map((part, i) => (
         part.toLowerCase() === highlight.toLowerCase() ? (
-          <Box
+          <Text
             key={i}
-            component="span"
-            sx={{
-              backgroundColor: 'warning.light',
-              color: 'warning.contrastText',
+            style={{
+              backgroundColor: '#faad14',
+              color: '#fff',
               padding: '0 2px',
               borderRadius: '2px',
             }}
           >
             {part}
-          </Box>
+          </Text>
         ) : (
           <React.Fragment key={i}>{part}</React.Fragment>
         )

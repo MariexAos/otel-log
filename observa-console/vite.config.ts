@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/observa-api': {
-        target: 'http://localhost:8080',
+        target: 'http://k8s.orb.local',
         changeOrigin: true,
         secure: false,
       }

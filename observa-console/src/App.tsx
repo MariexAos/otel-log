@@ -1,19 +1,23 @@
 import React from 'react';
-import { ThemeProvider, CssBaseline, Container, Box } from '@mui/material';
-import theme from './theme/theme';
+import { ConfigProvider, theme } from 'antd';
+import zhCN from 'antd/locale/zh_CN';
 import LogSearch from './components/LogSearch';
 import LogViewer from './components/LogViewer';
+import LogHistogram from './components/LogHistogram';
 
 const App: React.FC = () => (
-  <ThemeProvider theme={theme}>
-    <CssBaseline enableColorScheme/>
-    <Container maxWidth="xl">
-      <Box sx={{ py: 4 }}>
-        <LogSearch />
-        <LogViewer />
-      </Box>
-    </Container>
-  </ThemeProvider>
+  <ConfigProvider
+    locale={zhCN}
+    theme={{
+      algorithm: theme.defaultAlgorithm,
+    }}
+  >
+    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '32px 0' }}>
+      <LogSearch />
+      <LogHistogram />
+      <LogViewer />
+    </div>
+  </ConfigProvider>
 );
 
 export default App;
