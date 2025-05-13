@@ -56,7 +56,7 @@ public class LogController {
 
         LocalDateTime endLocalTime = StrUtil.isNotBlank(endTime)
                 ? LocalDateTime.parse(endTime, formatter)
-                : LocalDateTime.now();
+                : null;
 
         return switch (operation.toLowerCase()) {
             case "query" -> ResponseEntity.ok(logQueryService.queryLogs(

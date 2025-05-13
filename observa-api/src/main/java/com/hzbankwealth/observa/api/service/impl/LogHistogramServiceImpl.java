@@ -63,9 +63,6 @@ public class LogHistogramServiceImpl implements LogHistogramService {
             if (startTime == null) {
                 startTime = defaultRange[0];
             }
-            if (endTime == null) {
-                endTime = defaultRange[1];
-            }
         }
         
         // 转换为时间格式
