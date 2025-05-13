@@ -34,7 +34,7 @@ public class LogQueryServiceImpl implements LogQueryService {
         LambdaQueryWrapper<LogEntity> wrapper = new LambdaQueryWrapper<>();
 
         if (StrUtil.isNotBlank(logQuery)) {
-            wrapper.apply("body MATCH_ANY {0}", logQuery);
+            wrapper.apply("body MATCH_ALL {0}", logQuery);
         }
 
         if (StrUtil.isNotBlank(cluster)) {
