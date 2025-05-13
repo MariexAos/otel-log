@@ -98,7 +98,7 @@ const LogSearch: React.FC = () => {
             </Col>
           </Row>
           <TextArea
-            placeholder="日志内容"
+            placeholder="关键词"
             value={queryParams.log_query || ''}
             onChange={(e) => setQueryParams({ log_query: e.target.value })}
             rows={2}

@@ -23,8 +23,8 @@ const SearchResultStats: React.FC<{
     <Card 
       size="small" 
       style={{ marginBottom: showHistogram ? 0 : 16 }}
-      bodyStyle={{ padding: '16px' }}
-      bordered={false}
+      styles={{ body: { padding: '16px' } }}
+      variant="borderless"
     >
       <div style={{ 
         display: 'flex', 
@@ -86,7 +86,11 @@ const HistogramChart: React.FC<{
   if (isLoading) {
     return (
       <div style={{ textAlign: 'center', padding: '32px 0' }}>
-        <Spin tip="加载中..." />
+        <Spin>
+          <div style={{ padding: '50px', background: 'rgba(0, 0, 0, 0.05)' }}>
+            加载中...
+          </div>
+        </Spin>
       </div>
     );
   }

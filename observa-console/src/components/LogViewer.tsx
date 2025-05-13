@@ -14,7 +14,7 @@ dayjs.locale('zh-cn');
 
 // 定义列宽常量
 const COLUMN_WIDTHS = {
-  timestamp: 180,
+  timestamp: 220,
   namespace: 120,
   pod: 150,
   container: 120,
@@ -48,7 +48,8 @@ const LogViewer: React.FC = () => {
   }, [loading, logs, queryParams.from, queryParams.size, fetchLogs, setQueryParams]);
 
   const formatDate = (dateString: string) => {
-    return dayjs(dateString).format('YYYY年MM月DD日 HH:mm:ss');
+    const date = dayjs(dateString);
+    return date.format('YYYY年MM月DD日 HH:mm:ss.SSS');
   };
 
   const renderLogItem = (index: number, record: LogRecord) => (
