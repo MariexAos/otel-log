@@ -52,7 +52,7 @@ const LogViewer: React.FC = () => {
     return date.format('YYYY年MM月DD日 HH:mm:ss.SSS');
   };
 
-  const renderLogItem = (index: number, record: LogRecord) => (
+  const renderLogItem = (_index: number, record: LogRecord) => (
     <div style={{ 
       padding: '8px 16px',
       borderBottom: '1px solid #f0f0f0',

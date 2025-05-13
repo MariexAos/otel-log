@@ -5,6 +5,7 @@ import LogSearch from './components/LogSearch';
 import LogViewer from './components/LogViewer';
 import LogHistogram from './components/LogHistogram';
 
+console.log("API endpoint: ", import.meta.env.VITE_API_BASE);
 const App: React.FC = () => (
   <ConfigProvider
     locale={zhCN}
