@@ -11,7 +11,7 @@ receivers:
 
 exporters:
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.124.0
-
+  - gomod: go.opentelemetry.io/collector/exporter/debugexporter v0.124.0
 processors:
   - gomod: go.opentelemetry.io/collector/processor/batchprocessor v0.124.0
   - gomod: go.opentelemetry.io/collector/processor/memorylimiterprocessor v0.124.0
