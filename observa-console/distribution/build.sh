@@ -1,0 +1,1 @@
+docker build -f distribution/Dockerfile -t opentelemetry/observa-console:latest .
