@@ -28,7 +28,7 @@ public class LogExportServiceImpl implements LogExportService {
             String startTime, String endTime,
             String sort, String cluster) {
         
-        StringBuilder querySql = new StringBuilder("SELECT timestamp, body, namespace, pod, container FROM otel_logs_test WHERE 1=1");
+        StringBuilder querySql = new StringBuilder("SELECT timestamp, body, namespace, pod, container FROM observa_otel_logs WHERE 1=1");
         
         MapSqlParameterSource params = new MapSqlParameterSource();
         

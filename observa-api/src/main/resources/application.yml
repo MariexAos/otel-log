@@ -4,7 +4,7 @@ spring:
   # Doris数据库连接配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://ubuntu.orb.local:9030/log_db
+    url: jdbc:mysql://148.150.11.147:9030/observa_otel
     username: root
     password: root@1234
     hikari:

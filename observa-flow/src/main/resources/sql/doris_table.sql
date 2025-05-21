@@ -1,14 +1,14 @@
-CREATE TABLE IF NOT EXISTS `otel_logs_test` (
+CREATE TABLE IF NOT EXISTS `observa_otel_logs` (
                                                 `timestamp` DATETIME(6) COMMENT '日志时间',
                                                 `severity` TEXT COMMENT '日志级别',
                                                 `body` TEXT COMMENT '内容',
                                                 `attributes` JSON COMMENT '属性',
                                                 `trace_id` TEXT COMMENT '追踪ID',
                                                 `span_id` TEXT COMMENT '跨度ID',
-                                                `cluster` TEXT COMMENT '集群名称',
+                                                `cluster` TEXT COMMENT '集群',
                                                 `namespace` TEXT COMMENT '命名空间',
-                                                `pod` TEXT COMMENT 'pod名称',
-                                                `container` TEXT COMMENT '容器名称',
+                                                `pod` TEXT COMMENT '容器组',
+                                                `container` TEXT COMMENT '容器',
                                                 INDEX idx_body (`body`) USING INVERTED PROPERTIES("parser" = "unicode", "support_phrase" = "true"),
                                                 INDEX idx_trace_id(`trace_id`) USING INVERTED,
                                                 INDEX idx_severity(`severity`) USING INVERTED,
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `otel_logs_test` (
                    "dynamic_partition.start" = "-30",
                    "dynamic_partition.end" = "1",
                    "dynamic_partition.prefix" = "p",
-                   "dynamic_partition.buckets" = "10",
+                   "dynamic_partition.buckets" = "6",
                    "dynamic_partition.replication_num" = "1",
                    "replication_num" = "1"
                );

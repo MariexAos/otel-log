@@ -1,13 +1,13 @@
 server:
-  port: 18080
+  port: 8080
 
 spring:
   application:
-    name: log-transfer-application
+    name: observa-flow
 
   # Kafka Streams配置
   kafka:
-    bootstrap-servers: kafka.kafka.orb.local:9092
+    bootstrap-servers: 148.150.11.150:9092,148.150.11.151:9092,148.150.11.152:9092
     streams:
       application-id: ${spring.application.name}
       properties:
@@ -32,7 +32,7 @@ spring:
   # Doris数据库连接配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://ubuntu.orb.local:9030/log_db
+    url: jdbc:mysql://148.150.11.147:9030/observa_otel
     username: root
     password: root@1234
     hikari:
@@ -53,9 +53,9 @@ mybatis:
 # 应用自定义配置
 application:
   kafka:
-    input-topic: otel-proto
+    input-topic: observa-otel-logs
   doris:
-    table-name: otel_logs_test
+    table-name: observa_otel_logs
   window:
     size-seconds: 10          # 窗口大小，单位秒
     max-records: 1000         # 触发批处理的最大记录数

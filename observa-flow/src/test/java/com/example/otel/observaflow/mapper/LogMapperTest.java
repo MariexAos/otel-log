@@ -35,6 +35,6 @@ class LogMapperTest {
 
         logs.add(log1);
         logs.add(log2);
-        logMapper.batchInsert(logs, "otel_logs_test");
+        logMapper.batchInsert(logs, "observa_otel_logs");
     }
 }

@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("otel_logs_test")
+@TableName("observa_otel_logs")
 public class LogEntity {
     /**
      * 日期转换

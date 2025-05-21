@@ -25,8 +25,8 @@ public class LogStatisticsServiceImpl implements LogStatisticsService {
             String startTime, String endTime,
             String cluster) {
         
-        StringBuilder countLogsSql = new StringBuilder("SELECT COUNT(*) FROM otel_logs_test WHERE 1=1");
-        StringBuilder countContainersSql = new StringBuilder("SELECT COUNT(DISTINCT container) FROM otel_logs_test WHERE 1=1");
+        StringBuilder countLogsSql = new StringBuilder("SELECT COUNT(*) FROM observa_otel_logs WHERE 1=1");
+        StringBuilder countContainersSql = new StringBuilder("SELECT COUNT(DISTINCT container) FROM observa_otel_logs WHERE 1=1");
         
         MapSqlParameterSource params = new MapSqlParameterSource();
         

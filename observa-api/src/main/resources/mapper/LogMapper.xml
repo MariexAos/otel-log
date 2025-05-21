@@ -6,7 +6,7 @@
         SELECT
             DATE_FORMAT(`timestamp`, #{timeFormat}) AS time_bucket,
             COUNT(*) AS count
-        FROM otel_logs_test
+        FROM observa_otel_logs
         ${ew.customSqlSegment}
         GROUP BY time_bucket
         ORDER BY time_bucket
