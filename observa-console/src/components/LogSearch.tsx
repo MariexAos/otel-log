@@ -26,6 +26,7 @@ const LogSearch: React.FC = () => {
       pod_query: '',
       container_query: '',
       log_query: '',
+      cluster: '',
       start_time: undefined,
       end_time: undefined,
       from: 0, // 重置分页
@@ -50,6 +51,14 @@ const LogSearch: React.FC = () => {
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
           <Title level={5}>日志搜索</Title>
           <Row gutter={16}>
+            <Col flex="1">
+              <Input
+                placeholder="集群"
+                value={queryParams.cluster || ''}
+                onChange={(e) => setQueryParams({ cluster: e.target.value })}
+                allowClear
+              />
+            </Col>
             <Col flex="1">
               <Input
                 placeholder="命名空间"

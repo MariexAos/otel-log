@@ -1,5 +1,6 @@
-import React, { useEffect, useCallback } from 'react';
-import { Card, Typography, Spin } from 'antd';
+import React, { useEffect, useCallback, useState } from 'react';
+import { Card, Typography, Spin, Dropdown, Checkbox, Button } from 'antd';
+import { SettingOutlined } from '@ant-design/icons';
 import { Virtuoso } from 'react-virtuoso';
 import useLogStore from '../stores/logStore';
 import { type LogRecord } from '../services/api';
@@ -12,16 +13,25 @@ const { Text } = Typography;
 // 设置 dayjs 使用中文
 dayjs.locale('zh-cn');
 
-// 定义列宽常量
-const COLUMN_WIDTHS = {
-  timestamp: 220,
-  namespace: 120,
-  pod: 150,
-  container: 120,
+// 定义列配置
+const COLUMNS = {
+  timestamp: { key: 'timestamp', label: '时间', width: 220 },
+  cluster: { key: 'cluster', label: '集群', width: 100 },
+  namespace: { key: 'namespace', label: '命名空间', width: 120 },
+  pod: { key: 'pod', label: '容器组', width: 150 },
+  container: { key: 'container', label: '容器', width: 120 },
+  body: { key: 'body', label: '日志', width: undefined }, // flex: 1
 } as const;
+
+type ColumnKey = keyof typeof COLUMNS;
 
 const LogViewer: React.FC = () => {
   const { logs, loading, error, queryParams, fetchLogs, searchLogs, setQueryParams } = useLogStore();
+  
+  // 管理可见列状态
+  const [visibleColumns, setVisibleColumns] = useState<ColumnKey[]>([
+    'timestamp', 'cluster', 'namespace', 'pod', 'container', 'body'
+  ]);
 
   useEffect(() => {
     if (!logs) {
@@ -52,6 +62,77 @@ const LogViewer: React.FC = () => {
     return date.format('YYYY年MM月DD日 HH:mm:ss.SSS');
   };
 
+  // 处理列可见性变化
+  const handleColumnVisibilityChange = (checkedValues: ColumnKey[]) => {
+    // 确保至少保留一列
+    if (checkedValues.length > 0) {
+      setVisibleColumns(checkedValues);
+    }
+  };
+
+  // 渲染列设置菜单
+  const renderColumnSettings = () => {
+    const options = Object.entries(COLUMNS).map(([key, config]) => ({
+      label: config.label,
+      value: key as ColumnKey,
+    }));
+
+    return (
+      <div style={{ 
+        padding: '12px',
+        backgroundColor: '#fff',
+        borderRadius: '8px',
+        boxShadow: '0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05)',
+        border: '1px solid #f0f0f0',
+        minWidth: '160px'
+      }}>
+        <div style={{ 
+          marginBottom: '8px', 
+          fontWeight: 'bold',
+          color: '#262626',
+          fontSize: '14px'
+        }}>
+          列显示设置
+        </div>
+        <Checkbox.Group
+          options={options}
+          value={visibleColumns}
+          onChange={handleColumnVisibilityChange}
+          style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: '6px'
+          }}
+        />
+      </div>
+    );
+  };
+
+  // 获取单个列的渲染内容
+  const getColumnContent = (columnKey: ColumnKey, record: LogRecord) => {
+    switch (columnKey) {
+      case 'timestamp':
+        return formatDate(record.timestamp);
+      case 'cluster':
+        return record.cluster || '-';
+      case 'namespace':
+        return record.namespace;
+      case 'pod':
+        return record.pod;
+      case 'container':
+        return record.container;
+      case 'body':
+        return (
+          <HighlightText 
+            text={record.body} 
+            highlight={queryParams.log_query || ''} 
+          />
+        );
+      default:
+        return '';
+    }
+  };
+
   const renderLogItem = (_index: number, record: LogRecord) => (
     <div style={{ 
       padding: '8px 16px',
@@ -60,24 +141,24 @@ const LogViewer: React.FC = () => {
       gap: '16px',
       alignItems: 'flex-start'
     }}>
-      <div style={{ width: COLUMN_WIDTHS.timestamp, flexShrink: 0 }}>
-        {formatDate(record.timestamp)}
-      </div>
-      <div style={{ width: COLUMN_WIDTHS.namespace, flexShrink: 0 }}>
-        {record.namespace}
-      </div>
-      <div style={{ width: COLUMN_WIDTHS.pod, flexShrink: 0 }}>
-        {record.pod}
-      </div>
-      <div style={{ width: COLUMN_WIDTHS.container, flexShrink: 0 }}>
-        {record.container}
-      </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <HighlightText 
-          text={record.body} 
-          highlight={queryParams.log_query || ''} 
-        />
-      </div>
+      {visibleColumns.map((columnKey) => {
+        const column = COLUMNS[columnKey];
+        const isBodyColumn = columnKey === 'body';
+        
+        return (
+          <div 
+            key={columnKey}
+            style={{ 
+              width: isBodyColumn ? undefined : column.width,
+              flex: isBodyColumn ? 1 : undefined,
+              flexShrink: 0,
+              minWidth: isBodyColumn ? 0 : undefined
+            }}
+          >
+            {getColumnContent(columnKey, record)}
+          </div>
+        );
+      })}
     </div>
   );
 
@@ -112,7 +193,29 @@ const LogViewer: React.FC = () => {
   }
 
   return (
-    <Card style={{ height: 'calc(100vh - 200px)' }}>
+    <Card 
+      style={{ height: 'calc(100vh - 200px)' }}
+      extra={
+        <Dropdown
+          dropdownRender={() => renderColumnSettings()}
+          trigger={['click']}
+          placement="bottomRight"
+        >
+          <Button 
+            icon={<SettingOutlined />} 
+            size="small"
+            type="text"
+            style={{
+              color: '#8c8c8c',
+              border: 'none',
+              boxShadow: 'none'
+            }}
+          >
+            列设置
+          </Button>
+        </Dropdown>
+      }
+    >
       <div style={{ 
         display: 'flex',
         padding: '8px 16px',
@@ -125,11 +228,24 @@ const LogViewer: React.FC = () => {
         gap: '16px',
         alignItems: 'center'
       }}>
-        <div style={{ width: COLUMN_WIDTHS.timestamp, flexShrink: 0 }}>时间</div>
-        <div style={{ width: COLUMN_WIDTHS.namespace, flexShrink: 0 }}>命名空间</div>
-        <div style={{ width: COLUMN_WIDTHS.pod, flexShrink: 0 }}>容器组</div>
-        <div style={{ width: COLUMN_WIDTHS.container, flexShrink: 0 }}>容器</div>
-        <div style={{ flex: 1, minWidth: 0 }}>日志</div>
+        {visibleColumns.map((columnKey) => {
+          const column = COLUMNS[columnKey];
+          const isBodyColumn = columnKey === 'body';
+          
+          return (
+            <div 
+              key={columnKey}
+              style={{ 
+                width: isBodyColumn ? undefined : column.width,
+                flex: isBodyColumn ? 1 : undefined,
+                flexShrink: 0,
+                minWidth: isBodyColumn ? 0 : undefined
+              }}
+            >
+              {column.label}
+            </div>
+          );
+        })}
       </div>
       <Virtuoso
         style={{ height: 'calc(100vh - 300px)' }}

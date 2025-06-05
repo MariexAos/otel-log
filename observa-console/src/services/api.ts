@@ -3,7 +3,7 @@ import axios from 'axios';
 // API基础URL
 // const API_BASE_URL = import.meta.env.VITE_API_BASE + '/observa-api';
 const API_BASE_URL = import.meta.env.PROD 
-  ? (import.meta.env.VITE_API_BASE || 'http://k8s.orb.local') + '/observa-api'
+  ? import.meta.env.VITE_API_BASE + 'observa-api'
   : '/observa-api'; // 开发环境使用代理路径，生产环境使用完整URL
 
 // 日志查询接口参数类型
